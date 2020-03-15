@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Numerics;
 
 namespace RSA_Encryption
 {
@@ -12,11 +13,20 @@ namespace RSA_Encryption
             var p = GetPrimeNumber();
             var q = GetPrimeNumber();
             uint n = p * q;
-            uint d = 33;
+            uint d = GetPrimeNumber();
+            //uint e = GetPrimeNumber();
             uint e = GetOpen(d, p,q);
             var text = Console.ReadLine().ToLower().ToCharArray().ToList();
-            var list = text.ConvertAll(x => Convert.ToInt32( x)-97);
-            var cryptList = list.ConvertAll(x => Crypt(x, (int)e, (int)d));
+            var list = text.ConvertAll(x => Convert.ToInt32( x)-1072);
+            var cryptList = list.ConvertAll(x => Crypt((uint)x, e, n));
+            var resultCrypt = cryptList.ConvertAll(x => Convert.ToChar(x));
+            string s = "";
+            resultCrypt.ForEach(x => s += x);
+            Console.WriteLine(s);
+            var resultDeCrypt = resultCrypt.ConvertAll(x => Convert.ToInt32(x) - 1072).ConvertAll(x => Decrypt((uint)x, d, n)).ConvertAll(x => Convert.ToChar(x));
+            var s2 = "";
+            resultDeCrypt.ForEach(x => s2 += x);
+            Console.WriteLine(s2);
             Console.ReadLine();
         }
 
@@ -49,9 +59,15 @@ namespace RSA_Encryption
             }
             return (uint)e;
         }
-        private static int Crypt(int main, int e, int d)
+        private static int Crypt(uint main, uint e, uint n)
         {
-            return (main * e) % d;
+            var mod = Convert.ToInt32(Convert.ToString( BigInteger.ModPow(main, (ulong)e, (ulong)n)))+1072;
+            return mod;
+        }
+        private static int Decrypt(uint main, uint d, uint n)
+        {
+            var mod = Convert.ToInt32(Convert.ToString(BigInteger.ModPow(main, (ulong)d, (ulong)n))) + 1072;
+            return mod;
         }
     }
 }
