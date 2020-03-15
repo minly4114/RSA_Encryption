@@ -3,6 +3,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace RSA_Encryption
 {
@@ -19,21 +22,23 @@ namespace RSA_Encryption
 
             while (true)
             {
-                Console.WriteLine("Выберите действие/n/r1-Зашифровать/n/r2-Расшивровать/n/rДругой символ -Выход");
+                Console.WriteLine("Выберите действие:"+ Environment.NewLine + "1-Зашифровать методом RSA" + Environment.NewLine + "2-Расшифровать методом RSA" + Environment.NewLine + "3-Зашифровать методом Вернама" + Environment.NewLine + "4-Расшифровать методом Вернама" + Environment.NewLine + "Другой символ -Выход");
                 var com = Console.ReadLine();
                 if (int.TryParse(com, out int command))
                 {
                     if (command == 1)
                     {
+                        Console.WriteLine("Введите строку: ");
                         var list = Console.ReadLine().ToLower().ToCharArray().ToList();
                         var cryptList = list.ConvertAll(x => Crypt((uint)x, e, n));
                         string s = "";
                         cryptList.ForEach(x => s += x + "-");
                         s.Remove(s.Length - 1);
-                        Console.WriteLine(s);
+                        Console.WriteLine("Зашифрованная строка: " + s);
                     }
                     else if (command == 2)
                     {
+                        Console.WriteLine("Введите строку: ");
                         var text = Console.ReadLine();
                         Regex regex = new Regex("\\d+-{1}");
 
@@ -42,7 +47,37 @@ namespace RSA_Encryption
                         var resultDeCrypt = list.ConvertAll(x => Decrypt(x, d, n)).ConvertAll(x => Convert.ToChar(x));
                         var s2 = "";
                         resultDeCrypt.ForEach(x => s2 += x);
-                        Console.WriteLine(s2);
+                        Console.WriteLine("Расшифрованная строка: " + s2);
+                    }
+                    else if (command == 3)
+                    {
+                        Console.WriteLine("Введите Ключ: ");
+                        var key = Console.ReadLine();
+                        Console.WriteLine("Введите текст: ");
+                        var text = Console.ReadLine();
+                        List<BitArray> keyBits = new List<BitArray>();
+                        List<BitArray> textBits =  new List<BitArray>();
+                        key.ToCharArray().ToList().ForEach(x =>
+                        {
+                            var a = new BitArray(new int[] { x });
+                            keyBits.Add(a);
+                        });
+                        text.ToCharArray().ToList().ForEach(x =>
+                        {
+                            var a = new BitArray(new int[] { x });
+                            textBits.Add(a);
+                        });
+                        List<BitArray> result = new List<BitArray>();
+                        for (int i = 0; i < textBits.Count; i++)
+                        {
+                            int iKey = i % keyBits.Count;
+                            result.Add(textBits[i].Xor(keyBits[iKey]));
+                        }
+                        var res = result.ConvertAll(x => Convert.ToChar(x));
+                    }
+                    else if (command == 4)
+                    {
+
                     }
                     else
                     {
