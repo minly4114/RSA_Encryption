@@ -20,9 +20,11 @@ namespace RSA_Encryption
             ulong e = GetOpen(fi);
             ulong d = GetPrivate(e,fi);
 
+            Console.InputEncoding = Encoding.Unicode;
+
             while (true)
             {
-                Console.WriteLine("Выберите действие:"+ Environment.NewLine + "1-Зашифровать методом RSA" + Environment.NewLine + "2-Расшифровать методом RSA" + Environment.NewLine + "3-Зашифровать методом Вернама" + Environment.NewLine + "4-Расшифровать методом Вернама" + Environment.NewLine + "Другой символ -Выход");
+                Console.WriteLine("Выберите действие:"+ Environment.NewLine + "1-Зашифровать методом RSA" + Environment.NewLine + "2-Расшифровать методом RSA" + Environment.NewLine + "3-Зашифровать методом Вернама" + Environment.NewLine + "4-Расшифровать методом Вернама" + Environment.NewLine + "5-Засшифровать методом Цезаря" + Environment.NewLine + "6-Расшифровать методом Цезаря" + Environment.NewLine + "Другой символ -Выход");
                 var com = Console.ReadLine();
                 if (int.TryParse(com, out int command))
                 {
@@ -56,7 +58,7 @@ namespace RSA_Encryption
                         Console.WriteLine("Введите текст: ");
                         var text = Console.ReadLine();
                         List<BitArray> keyBits = new List<BitArray>();
-                        List<BitArray> textBits =  new List<BitArray>();
+                        List<BitArray> textBits = new List<BitArray>();
                         key.ToCharArray().ToList().ForEach(x =>
                         {
                             var a = new BitArray(new int[] { x });
@@ -77,7 +79,7 @@ namespace RSA_Encryption
                         {
                             byte[] bytes = new byte[x.Length];
                             x.CopyTo(bytes, 0);
-                            return Encoding.Unicode.GetString(bytes).Replace("\0","");
+                            return Encoding.Unicode.GetString(bytes).Replace("\0", "");
                         });
                         res.ForEach(x => Console.Write(x));
                         Console.WriteLine();
@@ -114,6 +116,46 @@ namespace RSA_Encryption
                         });
                         res.ForEach(x => Console.Write(x));
                         Console.WriteLine();
+                    }
+                    else if (command == 5)
+                    {
+                        Console.WriteLine("Введите Ключ: ");
+                        var key = Console.ReadLine();
+                        if (int.TryParse(key, out int ikey))
+                        {
+                            Console.WriteLine("Введите текст: ");
+                            var text = Console.ReadLine();
+                            var list = text.ToCharArray().ToList().ConvertAll(x=>(int)x);
+                            ikey = ikey % 65536;
+                            var result = list.ConvertAll(x => (x + ikey) % 65536);
+                            var a =result.ConvertAll(x=>char.ConvertFromUtf32(x));
+                            a.ForEach(x => Console.Write(x));
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Некорректный ключ");
+                        }
+                    }
+                    else if (command == 6)
+                    {
+                        Console.WriteLine("Введите Ключ: ");
+                        var key = Console.ReadLine();
+                        if (int.TryParse(key, out int ikey))
+                        {
+                            Console.WriteLine("Введите текст: ");
+                            var text = Console.ReadLine();
+                            var list = text.ToCharArray().ToList().ConvertAll(x => (int)x);
+                            ikey = ikey % 65536;
+                            var result = list.ConvertAll(x => (x + 65536 - ikey) % 65536);
+                            var a = result.ConvertAll(x => char.ConvertFromUtf32(x));
+                            a.ForEach(x => Console.Write(x));
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Некорректный ключ");
+                        }
                     }
                     else
                     {
