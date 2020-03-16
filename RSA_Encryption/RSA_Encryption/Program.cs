@@ -20,11 +20,11 @@ namespace RSA_Encryption
             ulong e = GetOpen(fi);
             ulong d = GetPrivate(e,fi);
 
-            Console.InputEncoding = Encoding.Unicode;
+            //Console.InputEncoding = Encoding.Unicode;
 
             while (true)
             {
-                Console.WriteLine("Выберите действие:"+ Environment.NewLine + "1-Зашифровать методом RSA" + Environment.NewLine + "2-Расшифровать методом RSA" + Environment.NewLine + "3-Зашифровать методом Вернама" + Environment.NewLine + "4-Расшифровать методом Вернама" + Environment.NewLine + "5-Засшифровать методом Цезаря" + Environment.NewLine + "6-Расшифровать методом Цезаря" + Environment.NewLine + "Другой символ -Выход");
+                Console.WriteLine("Выберите действие:"+ Environment.NewLine + "1-Зашифровать методом RSA" + Environment.NewLine + "2-Расшифровать методом RSA" + Environment.NewLine + "3-Зашифровать методом Вернама" + Environment.NewLine + "4-Расшифровать методом Вернама" + Environment.NewLine + "5-Засшифровать методом Цезаря" + Environment.NewLine + "6-Расшифровать методом Цезаря" + Environment.NewLine + "7-Засшифровать методом Вижинера" + Environment.NewLine + "8-Расшифровать методом Вижинера" + Environment.NewLine + "Другой символ -Выход");
                 var com = Console.ReadLine();
                 if (int.TryParse(com, out int command))
                 {
@@ -42,10 +42,11 @@ namespace RSA_Encryption
                     {
                         Console.WriteLine("Введите строку: ");
                         var text = Console.ReadLine();
-                        Regex regex = new Regex("\\d+-{1}");
-
-                        var match = regex.Matches(text).ToList();
+                        Regex regex1 = new Regex("\\d+-{1}");
+                        Regex regex2 = new Regex("\\d+$");
+                        var match = regex1.Matches(text).ToList();
                         var list = match.ConvertAll(x => Convert.ToUInt64(x.ToString().Replace("-", "")));
+                        list.Add(Convert.ToUInt64(regex2.Match(text).ToString()));
                         var resultDeCrypt = list.ConvertAll(x => Decrypt(x, d, n)).ConvertAll(x => Convert.ToChar(x));
                         var s2 = "";
                         resultDeCrypt.ForEach(x => s2 += x);
@@ -81,6 +82,7 @@ namespace RSA_Encryption
                             x.CopyTo(bytes, 0);
                             return Encoding.Unicode.GetString(bytes).Replace("\0", "");
                         });
+                        Console.WriteLine("Зашифрованная строка: ");
                         res.ForEach(x => Console.Write(x));
                         Console.WriteLine();
                     }
@@ -114,6 +116,7 @@ namespace RSA_Encryption
                             x.CopyTo(bytes, 0);
                             return Encoding.Unicode.GetString(bytes).Replace("\0", "");
                         });
+                        Console.WriteLine("Расшифрованная строка: ");
                         res.ForEach(x => Console.Write(x));
                         Console.WriteLine();
                     }
@@ -125,11 +128,11 @@ namespace RSA_Encryption
                         {
                             Console.WriteLine("Введите текст: ");
                             var text = Console.ReadLine();
-                            var list = text.ToCharArray().ToList().ConvertAll(x=>(int)x);
+                            var list = text.ToCharArray().ToList().ConvertAll(x => (int)x);
                             ikey = ikey % 65536;
                             var result = list.ConvertAll(x => (x + ikey) % 65536);
-                            var a =result.ConvertAll(x=>char.ConvertFromUtf32(x));
-                            a.ForEach(x => Console.Write(x));
+                            Console.Write("Зашифрованная строка: ");
+                            result.ConvertAll(x => char.ConvertFromUtf32(x)).ForEach(x => Console.Write(x));
                             Console.WriteLine();
                         }
                         else
@@ -148,14 +151,57 @@ namespace RSA_Encryption
                             var list = text.ToCharArray().ToList().ConvertAll(x => (int)x);
                             ikey = ikey % 65536;
                             var result = list.ConvertAll(x => (x + 65536 - ikey) % 65536);
-                            var a = result.ConvertAll(x => char.ConvertFromUtf32(x));
-                            a.ForEach(x => Console.Write(x));
+                            Console.Write("Расшифрованная строка: ");
+                            result.ConvertAll(x => char.ConvertFromUtf32(x)).ForEach(x => Console.Write(x));
                             Console.WriteLine();
                         }
                         else
                         {
                             Console.WriteLine("Некорректный ключ");
                         }
+                    }
+                    else if (command == 7)
+                    {
+                        Console.WriteLine("Введите Ключ в следующем формате '1,2,3,4,5' ");
+                        var key = Console.ReadLine();
+                        Regex regex1 = new Regex("\\d+,{1}");
+                        Regex regex2 = new Regex("\\d+$");
+                        var keyList = regex1.Matches(key).ToList().ConvertAll(x => Convert.ToInt32(x.ToString().Replace(",", "")));
+                        keyList.Add(Convert.ToInt32(regex2.Match(key).ToString()));
+                        Console.WriteLine("Введите текст: ");
+                        var text = Console.ReadLine();
+                        var list = text.ToCharArray().ToList().ConvertAll(x => (int)x);
+                        var result = new List<string>();
+                        for(int i=0;i<list.Count;i++)
+                        {
+                            int ikey = i % keyList.Count;
+                            result.Add(char.ConvertFromUtf32((list[i] + keyList[ikey]) % 65536));
+                        }
+                        Console.Write("Зашифрованная строка: ");
+                        result.ForEach(x => Console.Write(x));
+                        Console.WriteLine();
+                    }
+                    else if (command == 8)
+                    {
+                        Console.WriteLine("Введите Ключ в следующем формате '1,2,3,4,5' ");
+                        var key = Console.ReadLine();
+                        Regex regex1 = new Regex("\\d+,{1}");
+                        Regex regex2 = new Regex("\\d+$");
+                        var keyList = regex1.Matches(key).ToList().ConvertAll(x => Convert.ToInt32(x.ToString().Replace(",", "")));
+                        keyList.Add(Convert.ToInt32(regex2.Match(key).ToString()));
+                        Console.WriteLine("Введите текст: ");
+                        var text = Console.ReadLine();
+                        var list = text.ToCharArray().ToList().ConvertAll(x => (int)x);
+                        var result = new List<string>();
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            int ikey = i % keyList.Count;
+                            result.Add(char.ConvertFromUtf32((list[i] + 65536 - keyList[ikey]) % 65536));
+                        }
+
+                        Console.Write("Расшифрованная строка: ");
+                        result.ForEach(x => Console.Write(x));
+                        Console.WriteLine();
                     }
                     else
                     {
