@@ -73,11 +73,47 @@ namespace RSA_Encryption
                             int iKey = i % keyBits.Count;
                             result.Add(textBits[i].Xor(keyBits[iKey]));
                         }
-                        var res = result.ConvertAll(x => Convert.ToChar(x));
+                        var res = result.ConvertAll(x =>
+                        {
+                            byte[] bytes = new byte[x.Length];
+                            x.CopyTo(bytes, 0);
+                            return Encoding.Unicode.GetString(bytes).Replace("\0","");
+                        });
+                        res.ForEach(x => Console.Write(x));
+                        Console.WriteLine();
                     }
                     else if (command == 4)
                     {
-
+                        Console.WriteLine("Введите Ключ: ");
+                        var key = Console.ReadLine();
+                        Console.WriteLine("Введите текст: ");
+                        var text = Console.ReadLine();
+                        List<BitArray> keyBits = new List<BitArray>();
+                        List<BitArray> textBits = new List<BitArray>();
+                        key.ToCharArray().ToList().ForEach(x =>
+                        {
+                            var a = new BitArray(new int[] { x });
+                            keyBits.Add(a);
+                        });
+                        text.ToCharArray().ToList().ForEach(x =>
+                        {
+                            var a = new BitArray(new int[] { x });
+                            textBits.Add(a);
+                        });
+                        List<BitArray> result = new List<BitArray>();
+                        for (int i = 0; i < textBits.Count; i++)
+                        {
+                            int iKey = i % keyBits.Count;
+                            result.Add(textBits[i].Xor(keyBits[iKey]));
+                        }
+                        var res = result.ConvertAll(x =>
+                        {
+                            byte[] bytes = new byte[x.Length];
+                            x.CopyTo(bytes, 0);
+                            return Encoding.Unicode.GetString(bytes).Replace("\0", "");
+                        });
+                        res.ForEach(x => Console.Write(x));
+                        Console.WriteLine();
                     }
                     else
                     {
