@@ -46,7 +46,11 @@ namespace RSA_Encryption
                         Regex regex2 = new Regex("\\d+$");
                         var match = regex1.Matches(text).ToList();
                         var list = match.ConvertAll(x => Convert.ToUInt64(x.ToString().Replace("-", "")));
-                        list.Add(Convert.ToUInt64(regex2.Match(text).ToString()));
+                        var addValue = regex2.Match(text).ToString();
+                        if (addValue != "")
+                        {
+                            list.Add(Convert.ToUInt64(addValue));
+                        }
                         var resultDeCrypt = list.ConvertAll(x => Decrypt(x, d, n)).ConvertAll(x => Convert.ToChar(x));
                         var s2 = "";
                         resultDeCrypt.ForEach(x => s2 += x);
@@ -58,66 +62,38 @@ namespace RSA_Encryption
                         var key = Console.ReadLine();
                         Console.WriteLine("Введите текст: ");
                         var text = Console.ReadLine();
-                        List<BitArray> keyBits = new List<BitArray>();
-                        List<BitArray> textBits = new List<BitArray>();
-                        key.ToCharArray().ToList().ForEach(x =>
+                        string res = "";
+                        for (int i = 0; i < text.Length; i++)
                         {
-                            var a = new BitArray(new int[] { x });
-                            keyBits.Add(a);
-                        });
-                        text.ToCharArray().ToList().ForEach(x =>
-                        {
-                            var a = new BitArray(new int[] { x });
-                            textBits.Add(a);
-                        });
-                        List<BitArray> result = new List<BitArray>();
-                        for (int i = 0; i < textBits.Count; i++)
-                        {
-                            int iKey = i % keyBits.Count;
-                            result.Add(textBits[i].Xor(keyBits[iKey]));
+                            int iKey = i % key.Length;
+                            res+=((int)text[i]^(int)key[iKey])+"-";
                         }
-                        var res = result.ConvertAll(x =>
-                        {
-                            byte[] bytes = new byte[x.Length];
-                            x.CopyTo(bytes, 0);
-                            return Encoding.Unicode.GetString(bytes).Replace("\0", "");
-                        });
                         Console.WriteLine("Зашифрованная строка: ");
-                        res.ForEach(x => Console.Write(x));
+                        Console.Write(res);
                         Console.WriteLine();
                     }
                     else if (command == 4)
                     {
                         Console.WriteLine("Введите Ключ: ");
                         var key = Console.ReadLine();
-                        Console.WriteLine("Введите текст: ");
+                        Console.WriteLine("Введите зашифрованную строку в следующем формате 5332-346-35: ");
                         var text = Console.ReadLine();
-                        List<BitArray> keyBits = new List<BitArray>();
-                        List<BitArray> textBits = new List<BitArray>();
-                        key.ToCharArray().ToList().ForEach(x =>
+                        Regex regex1 = new Regex("\\d+-{1}");
+                        Regex regex2 = new Regex("\\d+$");
+                        var match = regex1.Matches(text).ToList();
+                        var list = match.ConvertAll(x => Convert.ToInt32(x.ToString().Replace("-", "")));
+                        var addValue = regex2.Match(text).ToString();
+                        if (addValue != "")
                         {
-                            var a = new BitArray(new int[] { x });
-                            keyBits.Add(a);
-                        });
-                        text.ToCharArray().ToList().ForEach(x =>
+                            list.Add(Convert.ToInt32(addValue));
+                        }                        string res = "";
+                        for (int i = 0; i < list.Count; i++)
                         {
-                            var a = new BitArray(new int[] { x });
-                            textBits.Add(a);
-                        });
-                        List<BitArray> result = new List<BitArray>();
-                        for (int i = 0; i < textBits.Count; i++)
-                        {
-                            int iKey = i % keyBits.Count;
-                            result.Add(textBits[i].Xor(keyBits[iKey]));
+                            int iKey = i % key.Length;
+                            res += char.ConvertFromUtf32(list[i] ^ (int)key[iKey]);
                         }
-                        var res = result.ConvertAll(x =>
-                        {
-                            byte[] bytes = new byte[x.Length];
-                            x.CopyTo(bytes, 0);
-                            return Encoding.Unicode.GetString(bytes).Replace("\0", "");
-                        });
                         Console.WriteLine("Расшифрованная строка: ");
-                        res.ForEach(x => Console.Write(x));
+                        Console.Write(res);
                         Console.WriteLine();
                     }
                     else if (command == 5)
